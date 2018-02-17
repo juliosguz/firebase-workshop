@@ -1,10 +1,9 @@
+var database = firebase.database()
+var postsRef = database.ref('posts')
+
 document.addEventListener('DOMContentLoaded', onReady)
 
 function onReady () {
-  var database = firebase.database()
-
-  var postsRef = database.ref('posts')
-
   postsRef.on('child_added', function (snapshot) {
     addPostElement(snapshot.val(), snapshot.key)
   })
@@ -16,6 +15,8 @@ function onReady () {
   postsRef.on('child_changed', function (snapshot) {
     editPostElement(snapshot.val(), snapshot.key)
   })
+
+  document.getElementById('create-post').addEventListener('click', createPost)
 }
 
 function addPostElement (postObject, postId) {
@@ -47,6 +48,16 @@ function editPostElement (postObject, postId) {
   post.getElementsByClassName('post__title')[0].innerText = postObject.title
   post.getElementsByClassName('post__content')[0].innerText = postObject.content
   post.getElementsByClassName('post__creation-date')[0].innerText = postObject.creationDate
+}
+
+function createPost () {
+  var postForm = document.getElementById('post-form')
+
+  postsRef.push({
+    title: postForm.getElementsByClassName('title')[0].value,
+    content: postForm.getElementsByClassName('content')[0].value,
+    creationDate: (new Date()).toISOString()
+  })
 }
 
 // FIREBASE WARNING: Invalid query string segment:
